@@ -1,0 +1,10 @@
+in ssh_honeypot.py file: 
+import logging library ( we dont have to install it as it is now a part of python)
+
+STEP2: We need to name our logger we're going to use getLogger method as part of the logging library
+there are different level of logs that logging module will provide for us like: logging.debug, info, warning
+STEP3: setting handler basically set where we are going to log to which is from a library: which is import logging:
+from logging.handlers import RotatingFileHandler
+
+
+STEP4: next is adding format add to the constants (how do we want our messages to be formatted)
