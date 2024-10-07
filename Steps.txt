@@ -15,3 +15,9 @@ and another one will be for what hackers are doing( mainly analysing their activ
 
 
 Till now we have the emulated Shell and setted up the server using paramiko (which provides the functions)
+
+
+SSH key gen is a tool to make the publcprivate key pair.
+ssh-keygen -t rsa -b 2048 -f server.key
+
+#server.key needs to be guarded as we can see after this command 2files are made: server.key.pub can be public but not server.key it should be kept private and not uploaded on github.

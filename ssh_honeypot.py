@@ -7,6 +7,9 @@ import paramiko
 
 #Constants
 logging_format= logging.Formatter('%(message)s')
+#banner is the version in simple words or any other metadata: 
+SSH_BANNER="SSH-2.0-MySSHServer_1.0"
+host_key='server.key' 
 
 
 #Loggers & Logging Files
@@ -20,7 +23,7 @@ funnel_logger.addHandler(funnel_handler)
 
 
 
-#As we want one to record hackers activities.
+#As we want one to record hackers activities.(basically it will capture the commands which hacker will enter)
 creds_logger= logging.getLogger('FunnelLogger')
 creds_logger.setLevel(logging.INFO) 
 creds_handler= RotatingFileHandler('cmd_audits.log', maxBytes=2000, backupCount=5) 
@@ -104,4 +107,45 @@ class Server(paramiko.ServerInterface):
         
      
         
+#creating paramikoSSH instance and using the sockets library we can bind the server to a specific address and port, which will allow clients to come and connect to our server:
+#using some constructs from the paramiko library:
+def client_handle(client,addr,username,password):
+    #creating and mantaining a connection
+    #getting the client IP address first
+    client_ip=addr[0] #passing in the client IP address
+    print(f"{client_ip}has connected to the server")
+    
+    try:
+        #initialize a new transport object: handling the low level ssh connections:
+        transport= paramiko.Transport()
+        transport.local_version=SSH_BANNER #custom banner
+        #now as we are creating a new session let's setup a server now:
+        #so we will create instance of that server:
+        server=Server(client_ip=client_ip,input_username=username,input_password=password)#as in server class we needed to define 3 paramters. We also need to set client_ip inorder to open the session.
+        
+        #Passing the ssh server session into the class
+        transport.add_server_key(host_key) #hostkey is a public private key pair which allows incoming connection or clients to verify that the server is genuine. We will generate our own key.
+        transport.start_server(server=server) #taking the ssh session to start the server
+        
+        channel=transport.accept(100) #this waits for the client to open a wether a shell cmd and the 100is the ms for the client to req the channel. if its done then a bidirectional tunnel will be created.
+        #if not:
+        if channel is None:
+            print("No channel was opened")
+        
+        #Proceed to create another SSH BANNER this banner is going to be printed when we attempt to ssh into the honeypot file
+        #below message will be displayed when a new session has been established
+        
+        standard_banner="Welcome to Ubuntu this project is made by Suryansh Narang\r\n\r\n"
+        channel.send(standard_banner)
+        emulated_shell(channel,client_ip=client_ip)
+        
+    except Exception as error:
+        print(error)
+        print("Hey an exception occured.")
+    finally:
+        try:
+            transport.close() #closing the connection
+        except Exception as error:
+            print("Hey an exception occured.") 
+        client.close()
 #Provision SSH based Honeypot
