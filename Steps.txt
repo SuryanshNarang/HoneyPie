@@ -8,3 +8,10 @@ from logging.handlers import RotatingFileHandler
 
 
 STEP4: next is adding format add to the constants (how do we want our messages to be formatted)
+
+
+We have to repeat the same thing as one audits.log will be for usernames,ip and password
+and another one will be for what hackers are doing( mainly analysing their activities)
+
+
+Till now we have the emulated Shell and setted up the server using paramiko (which provides the functions)
