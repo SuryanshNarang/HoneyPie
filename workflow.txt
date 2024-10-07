@@ -1,0 +1,49 @@
+Certainly! Here’s a step-by-step overview of the workflow for the SSH server setup and client handling:
+
+Workflow:
+Initialization:
+
+The SSH server is initialized with a client’s IP address, username, and password.
+Client Connection:
+
+A client tries to connect to the server using a socket.
+The server accepts this connection and retrieves the client’s IP address.
+SSH Transport Setup:
+
+A Transport object from Paramiko is created, which manages the low-level SSH protocol.
+The server sets a custom SSH banner for the connection.
+A server key is added to authenticate the server to the client.
+Custom Server Interface:
+
+The server interface (Server) is instantiated, which provides methods for managing various SSH operations like authentication and channel handling.
+The start_server method is called on the Transport object, passing the custom Server instance, starting the SSH server.
+Channel Handling:
+
+The server waits for the client to request a session channel (an SSH channel for communication).
+Once a channel request is received, it’s checked if it is of type ‘session’. If so, the connection is allowed to proceed.
+Authentication:
+
+The server requests password authentication from the client.
+The check_auth_password method verifies if the client-provided credentials match the expected username and password.
+If authentication is successful, the client is allowed to proceed; otherwise, the connection fails.
+Shell and PTY Requests:
+
+The server accepts requests for shell access and a PTY (pseudo-terminal) to provide an interactive terminal session.
+These allow the client to interact with the server as though they are on a typical terminal.
+Welcome Banner:
+
+Upon successful connection, the server sends a custom banner message to the client (in this case, a welcome message).
+Command Execution:
+
+The client can send commands to the server, which are handled by check_channel_exec_request.
+This method interprets and executes the commands, or simply acknowledges them depending on the implementation.
+Session Management:
+
+Throughout the session, the server maintains the connection until the client disconnects or an error occurs.
+If any exceptions are raised during the connection, they are caught and handled to prevent the server from crashing.
+Connection Closure:
+
+Once the session ends, either by the client disconnecting or an error, the Transport and socket connections are closed.
+This ensures proper cleanup of resources and prepares the server for new connections.
+Summary:
+The server allows an SSH client to connect, authenticate with a username and password, and interact with a simulated shell environment. This workflow provides a basic honeypot setup for capturing SSH login attempts and monitoring commands issued by the client.

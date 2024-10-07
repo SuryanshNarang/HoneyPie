@@ -98,12 +98,12 @@ class Server(paramiko.ServerInterface):
     
     
     def check_channel_shell_request(self, channel): 
-        self.event.set()#This triggers an event, which is likely used to signal other parts of the code that a shell request has been made.
+        self.event.set()#This triggers an event, which is likely used to signal other parts of the code that a shell request has been made.( Accepts shell requests from the client.)
         return True  
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight, modes):
-        return True #In simple terms, this method is saying, "Yes, I’ll give you a terminal window with the requested settings." It approves the client’s request for a graphical terminal interface where they can run commands, making it more interactive and user-friendly.
+        return True #In simple terms, this method is saying, "Yes, I’ll give you a terminal window with the requested settings." It approves the client’s request for a graphical terminal interface where they can run commands, making it more interactive and user-friendly.(Accepts PTY (terminal) requests from the client.)
     def check_channel_exec_request(self, channel, command):
-        command= str(command) #Exact place where we are going to handle the commands that are being input
+        command= str(command) #Exact place where we are going to handle the commands that are being input( Handles execute requests (command execution) from the client.)
         
      
         
@@ -117,7 +117,7 @@ def client_handle(client,addr,username,password):
     
     try:
         #initialize a new transport object: handling the low level ssh connections:
-        transport= paramiko.Transport()
+        transport= paramiko.Transport()#Initializes a Paramiko transport object for SSH communication.
         transport.local_version=SSH_BANNER #custom banner
         #now as we are creating a new session let's setup a server now:
         #so we will create instance of that server:
@@ -149,3 +149,4 @@ def client_handle(client,addr,username,password):
             print("Hey an exception occured.") 
         client.close()
 #Provision SSH based Honeypot
+``

@@ -21,3 +21,6 @@ SSH key gen is a tool to make the publcprivate key pair.
 ssh-keygen -t rsa -b 2048 -f server.key
 
 #server.key needs to be guarded as we can see after this command 2files are made: server.key.pub can be public but not server.key it should be kept private and not uploaded on github.
+
+
+By passing the Server instance to Transport (using start_server(server=server)), you’re linking the two so that the Transport can use the Server’s methods to manage SSH requests appropriately.
