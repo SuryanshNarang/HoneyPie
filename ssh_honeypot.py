@@ -4,7 +4,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import socket
 import paramiko
-
+import threading
 #Constants
 logging_format= logging.Formatter('%(message)s')
 #banner is the version in simple words or any other metadata: 
@@ -77,6 +77,7 @@ def emulated_shell(channel,client_ip)   #channel is for communicating(like sendi
 class Server(paramiko.ServerInterface):
     #this class has serveral functions and this provide setting for ssh server
     def __init__(self,client_ip,input_username=None, input_password=None):
+        self.event=threading.Event()
         #local variables
         self.client_ip=client_ip
         self.input_username=input_username
@@ -95,7 +96,8 @@ class Server(paramiko.ServerInterface):
                 return paramiko.AUTH_SUCCESSFUL #if username and password are ok then authentication is successful we are logged in shell environment
             else:
                 return paramiko.AUTH_FAILED #if username and password are wrong then authentication fails
-    
+        else:
+            return paramiko.AUTH_SUCCESSFUL #if no username and password are ok then authentication is successful
     
     def check_channel_shell_request(self, channel): 
         self.event.set()#This triggers an event, which is likely used to signal other parts of the code that a shell request has been made.( Accepts shell requests from the client.)
@@ -148,5 +150,25 @@ def client_handle(client,addr,username,password):
         except Exception as error:
             print("Hey an exception occured.") 
         client.close()
-#Provision SSH based Honeypot
-``
+#Provision SSH based Honeypot (main function): when deploying we are going to call the instance of this function
+def honeypot(address,port,username,password):
+    #setup a new socket object , AF_INET this defines we are going to use ipv4 address
+    socks=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socks.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+    socks.bind((address,port)) #these will be passsed in our parameters as arguments 
+    socks.listen(100) #how many connections can we handle. anything above 100 can be refused ormay have to wait.
+    #makign sure that some of this info is printing out on the console so that the user knows whats going on.
+    print(f'SSH SERVER is listening on port {port}.')
+    #logic which will listenn on this particular ip and port, and its going to accept the connection, and then its going to hand that connection off to client handle then the ssh session and transport will be handled.
+    while True:
+        try:
+            #gather the client ip address and port
+            client, addr= socks.accept() #accept on any client and address
+            #now start a new thread? Why trheading as we want to handle multiple connections
+            ssh_honeypot_thread=threading.Thread(target=client_handle,args=(client,addr,username,password))
+            ssh_honeypot_thread.start()
+        except Exception as error:
+            print(error)
+      
+        
+    
