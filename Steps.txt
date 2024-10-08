@@ -24,3 +24,7 @@ ssh-keygen -t rsa -b 2048 -f server.key
 
 
 By passing the Server instance to Transport (using start_server(server=server)), you’re linking the two so that the Transport can use the Server’s methods to manage SSH requests appropriately.
+
+
+
+Python comes with extensive web server support so it is basically easier to setup a webBased Honeypot rather than ssh
