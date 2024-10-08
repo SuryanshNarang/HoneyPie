@@ -9,7 +9,7 @@ import threading
 logging_format= logging.Formatter('%(message)s')
 #banner is the version in simple words or any other metadata: 
 SSH_BANNER="SSH-2.0-MySSHServer_1.0"
-host_key='server.key' 
+host_key= paramiko.RSAKey(filename='server.key') 
 
 
 #Loggers & Logging Files
@@ -119,7 +119,7 @@ def client_handle(client,addr,username,password):
     
     try:
         #initialize a new transport object: handling the low level ssh connections:
-        transport= paramiko.Transport()#Initializes a Paramiko transport object for SSH communication.
+        transport= paramiko.Transport(client)#Initializes a Paramiko transport object for SSH communication.
         transport.local_version=SSH_BANNER #custom banner
         #now as we are creating a new session let's setup a server now:
         #so we will create instance of that server:
@@ -171,4 +171,7 @@ def honeypot(address,port,username,password):
             print(error)
       
         
-    
+#calling the function honeypot
+honeypot('127.0.0.1', 2223, 'username','password') #better to use higher port while we are testing.
+
+
